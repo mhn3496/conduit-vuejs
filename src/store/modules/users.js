@@ -18,8 +18,19 @@ export default {
   },
   actions: {
     getUser: async function({ commit }) {
+      var jwToken = localStorage.getItem("jwt");
+      console.log("jwToken------");
+      console.log(jwToken);
+      if (jwToken) {
+        setToken(jwToken);
+      }
       const user = await api.get("/user");
-      commit("setUser", user);
+      console.log(user.data.user);
+      if (user.data && user.data.user) {
+        console.log("user::::::::::");
+        console.log(user.data.user);
+        commit("setUser", user.data.user);
+      }
     },
     loginUser: async function({ commit }, { email, password }) {
       clearToken();
@@ -33,10 +44,10 @@ export default {
 
         if (response.data.user) {
           setToken(response.data.user.token);
+          localStorage.setItem("jwt", response.data.user.token);
           commit("setUser", response.data.user);
         }
       } catch (e) {
-        console.error("error:::::::");
         console.error(e);
         throw e;
       }

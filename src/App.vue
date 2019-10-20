@@ -11,6 +11,6 @@ export default {
   components: {
     NavBar
   }
-};</script
->>
+};
+</script>
 <style></style>

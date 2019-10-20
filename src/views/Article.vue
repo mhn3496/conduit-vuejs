@@ -124,5 +124,19 @@
         </div>
       </div>
     </div>
-  </div> </template
->>
+  </div>
+</template>
+<script>
+export default {
+  methods: {
+    //followUser(user_name) {},
+    //favouriteArticle(article_id) {}
+  },
+  created: {},
+  computed: {},
+
+  data: function() {
+    return {};
+  }
+};
+</script>
