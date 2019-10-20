@@ -3,7 +3,7 @@
     <div class="container">
       <a class="navbar-brand" href="index.html">conduit</a>
       <ul class="nav navbar-nav pull-xs-right">
-        <li v-if="username" class="nav-item">
+        <li class="nav-item">
           <router-link class="nav-link" to="/">
             Home
           </router-link>

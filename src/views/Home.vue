@@ -32,7 +32,7 @@
               </li>
             </ul>
           </div>
-
+          <div v-if="dataLoaded == false">Loading Articles....</div>
           <ArticlePreview
             v-for="article in globalArticles"
             :key="article.slug"
@@ -72,10 +72,14 @@ export default {
     setFeed(feedType) {
       if (feedType == "global") {
         this.activeFeed = "global";
+        this.dataLoaded = false;
         this.$store.dispatch("article/getGlobalFeed");
+        this.dataLoaded = true;
       } else if (feedType == "user") {
         this.activeFeed = "user";
+        this.dataLoaded = false;
         this.$store.dispatch("article/getUserFeed");
+        this.dataLoaded = true;
       }
     }
   },
@@ -93,6 +97,7 @@ export default {
   },
   data: function() {
     return {
+      dataLoaded: false,
       activeFeed: "global"
     };
   }

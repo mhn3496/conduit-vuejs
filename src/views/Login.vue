@@ -41,6 +41,7 @@
 </template>
 
 <script>
+import router from "../router";
 export default {
   data: function() {
     var obj = {
@@ -59,6 +60,7 @@ export default {
         })
         .then(() => {
           this.errors = [];
+          router.push({ name: "home" });
         })
         .catch(err => {
           this.errors.push(err);

@@ -3,9 +3,9 @@ import { api } from "../api";
 export default {
   namespaced: true,
   state: {
+    currentArticle: {},
     feed: [],
-    count: 0,
-    currentArticle: {}
+    count: 0
   },
   getters: {
     feed(state) {
@@ -16,9 +16,37 @@ export default {
     },
     currentArticle(state) {
       return state.currentArticle;
+    },
+    articleTitle(state) {
+      console.log("getting title:::::::");
+      console.log(state.currentArticle.title);
+      return state.currentArticle.title;
+    },
+    articleBody(state) {
+      return state.currentArticle.body;
+    },
+    articleAuthorName(state) {
+      return state.currentArticle.author.username;
+    },
+    articleAuthorImage(state) {
+      return state.currentArticle.author.image;
+    },
+    articleAuthorIsFollowed(state) {
+      return state.currentArticle.author.following;
+    },
+    articleTagsList(state) {
+      return state.currentArticle.tagList;
+    },
+    articleCreationDate(state) {
+      return state.currentArticle.createdAt;
     }
   },
   mutations: {
+    setCurrentArticle(state, _article) {
+      state.currentArticle = _article;
+      console.log("current article after mutation::::::");
+      console.log(state.currentArticle);
+    },
     setArticles(state, { articles, articlesCount }) {
       state.feed = articles;
       state.count = articlesCount;
@@ -62,9 +90,10 @@ export default {
     async getArticlebyId({ commit }, id) {
       let route = "/articles/";
       route += id;
-      console.log("article route::" + route);
       const response = await api.get(route);
-      commit("currentArticle", response.data);
+      console.log("response::::::::::::");
+      console.log(response.data.article);
+      commit("setCurrentArticle", response.data.article);
     }
   }
 };
