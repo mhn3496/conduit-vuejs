@@ -10,10 +10,11 @@
             <a href="" class="author">{{ articleAuthorName }}</a>
             <span class="date">{{ formatDate(articleCreationDate) }}</span>
           </div>
+
           <button v-if="!authorIsUser" class="btn btn-sm btn-outline-secondary">
             <i class="ion-plus-round"></i>
             &nbsp; Follow {{ articleAuthorName }}
-            <span class="counter">(10)</span>
+            <span class="counter"></span>
           </button>
           <button
             v-if="authorIsUser"
@@ -22,13 +23,20 @@
           >
             <i class="ion-plus-round"></i>
             &nbsp; Edit Article
-            <span class="counter">(10)</span>
           </button>
           &nbsp;&nbsp;
-          <button class="btn btn-sm btn-outline-primary">
+          <button class="btn btn-sm btn-outline-primary" v-if="!authorIsUser">
             <i class="ion-heart"></i>
             &nbsp; Favorite Post
             <span class="counter">({{ article.favoritesCount }})</span>
+          </button>
+          <button
+            class="btn btn-sm btn-outline-primary"
+            v-if="authorIsUser"
+            @click="deleteArticle"
+          >
+            <i class="ion-heart"></i>
+            &nbsp; Delete Article
           </button>
         </div>
       </div>
@@ -51,83 +59,61 @@
             <span class="date">{{ formatDate(articleBody.createdAt) }}</span>
           </div>
 
-          <button class="btn btn-sm btn-outline-secondary">
+          <button v-if="!authorIsUser" class="btn btn-sm btn-outline-secondary">
             <i class="ion-plus-round"></i>
-            &nbsp; Follow {{ article.author.username }}
-            <span class="counter">(10)</span>
+            &nbsp; Follow {{ articleAuthorName }}
+            <span class="counter"></span>
           </button>
-          &nbsp;
-          <button class="btn btn-sm btn-outline-primary">
+          <button
+            v-if="authorIsUser"
+            class="btn btn-sm btn-outline-secondary"
+            @click="routeToArticleEdit"
+          >
+            <i class="ion-plus-round"></i>
+            &nbsp; Edit Article
+          </button>
+          &nbsp;&nbsp;
+          <button class="btn btn-sm btn-outline-primary" v-if="!authorIsUser">
             <i class="ion-heart"></i>
             &nbsp; Favorite Post
             <span class="counter">({{ article.favoritesCount }})</span>
+          </button>
+          <button
+            class="btn btn-sm btn-outline-primary"
+            v-if="authorIsUser"
+            @click="deleteArticle"
+          >
+            <i class="ion-heart"></i>
+            &nbsp; Delete Article
           </button>
         </div>
       </div>
 
       <div class="row">
         <div class="col-xs-12 col-md-8 offset-md-2">
-          <form class="card comment-form">
+          <form v-if="username" class="card comment-form">
             <div class="card-block">
               <textarea
+                v-model="comment"
                 class="form-control"
                 placeholder="Write a comment..."
                 rows="3"
               ></textarea>
             </div>
             <div class="card-footer">
-              <img
-                src="http://i.imgur.com/Qr71crq.jpg"
-                class="comment-author-img"
-              />
-              <button class="btn btn-sm btn-primary">
+              <img :src="userImage" class="comment-author-img" />
+              <button @click="postComment" class="btn btn-sm btn-primary">
                 Post Comment
               </button>
             </div>
           </form>
 
-          <div class="card">
-            <div class="card-block">
-              <p class="card-text">
-                {{ articleBody }}
-              </p>
-            </div>
-            <div class="card-footer">
-              <a href="" class="comment-author">
-                <img
-                  src="http://i.imgur.com/Qr71crq.jpg"
-                  class="comment-author-img"
-                />
-              </a>
-              &nbsp;
-              <a href="" class="comment-author">Jacob Schmidt</a>
-              <span class="date-posted">Dec 29th</span>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-block">
-              <p class="card-text">
-                With supporting text below as a natural lead-in to additional
-                content.
-              </p>
-            </div>
-            <div class="card-footer">
-              <a href="" class="comment-author">
-                <img
-                  src="http://i.imgur.com/Qr71crq.jpg"
-                  class="comment-author-img"
-                />
-              </a>
-              &nbsp;
-              <a href="" class="comment-author">Jacob Schmidt</a>
-              <span class="date-posted">Dec 29th</span>
-              <span class="mod-options">
-                <i class="ion-edit"></i>
-                <i class="ion-trash-a"></i>
-              </span>
-            </div>
-          </div>
+          <Comment
+            v-for="comment in comments"
+            :key="comment.id"
+            :comment="comment"
+          >
+          </Comment>
         </div>
       </div>
     </div>
@@ -136,7 +122,12 @@
 <script>
 import moment from "moment";
 import router from "../router";
+import Comment from "@/components/Comment.vue";
+
 export default {
+  components: {
+    Comment
+  },
   props: {
     slug: {
       type: String,
@@ -147,55 +138,111 @@ export default {
     formatDate(dateString) {
       return moment(dateString).format("MMMM Do, YYYY");
     },
-    getArticle() {
-      console.log("getting Article");
-      var slug = this.$router.app._route.params.slug;
-      this.$store.dispatch("article/getArticlebyId", slug);
-    },
     followAuthor() {},
     routeToArticleEdit() {
       var obj = this.$store.getters["article/currentArticle"];
       router.push({ name: "editor_edit", params: { slug: obj.slug } });
+    },
+    deleteArticle() {
+      var obj = this.$store.getters["article/currentArticle"];
+      this.$store.dispatch("article/deleteArticle", obj.slug);
+      router.push({ name: "home" });
+    },
+    postComment() {
+      var obj = this.$store.getters["article/currentArticle"];
+      this.$store.dispatch("comments/postComment", {
+        slug: obj.slug,
+        body: this.comment
+      });
+      this.comment = "";
+      this.$store.dispatch("comments/getComments", {
+        slug: obj.slug
+      });
+      this.getComments();
+    },
+    getComments() {
+      var obj = this.$store.getters["article/currentArticle"];
+      this.$store.dispatch("comments/getComments", {
+        slug: obj.slug
+      });
+      this.comments = this.$store.getters["comment/commentsOnArticle"];
+    },
+    fetchComments() {
+      var slug = this.$router.app._route.params.slug;
+      this.$store.dispatch("comments/getComments", {
+        slug: slug
+      });
+    },
+    fetchArticle() {
+      var slug = this.$router.app._route.params.slug;
+      this.$store.dispatch("article/getArticlebyId", slug);
+    },
+    fetchUser() {
+      this.$store.dispatch("users/getUser");
     }
+
     //favouriteArticle(article_id) {}
   },
   created() {
-    this.getArticle();
+    this.fetchArticle();
+    this.fetchComments();
+    this.fetchUser();
+    //this.getComments();
   },
   computed: {
     article() {
       return this.$store.getters["article/currentArticle"];
     },
+
     articleTitle() {
-      return this.$store.getters["article/articleTitle"];
+      return this.$store.getters["article/currentArticle"].title;
     },
     articleBody() {
-      return this.$store.getters["article/articleBody"];
+      return this.$store.getters["article/currentArticle"].body;
     },
     articleAuthorName() {
-      return this.$store.getters["article/articleAuthorName"];
+      return this.$store.getters["article/currentArticle"].author.username;
     },
     articleAuthorImage() {
-      return this.$store.getters["article/articleAuthorImage"];
+      return this.$store.getters["article/currentArticle"].author.image;
     },
     articleAuthorIsFollowed() {
-      return this.$store.getters["article/articleAuthorIsFollowed"];
+      return this.$store.getters["article/currentArticle"].author.following;
     },
     articleTagsList() {
-      return this.$store.getters["article/articleTagsList"];
+      return this.$store.getters["article/currentArticle"].tagList;
     },
     articleCreationDate() {
-      return this.$store.getters["article/articleCreationDate"];
+      return this.$store.getters["article/currentArticle"].createdAt;
     },
     authorIsUser() {
       return (
         this.article.author.username == this.$store.getters["users/username"]
       );
+    },
+    comments() {
+      return this.$store.getters["comments/commentsOnArticle"];
+    },
+    username() {
+      var retObj = this.$store.getters["users/user"];
+      if (retObj) {
+        return retObj.username;
+      }
+      return null;
+    },
+    userImage() {
+      var retObj = this.$store.getters["users/user"];
+      if (retObj) {
+        return retObj.image;
+      }
+      return null;
     }
   },
 
   data: function() {
-    return {};
+    return {
+      comment: ""
+    };
   }
 };
 </script>

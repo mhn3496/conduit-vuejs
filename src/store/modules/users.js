@@ -7,8 +7,8 @@ export default {
     profile: null
   },
   getters: {
-    username(state) {
-      return (state.user && state.user.username) || null;
+    user(state) {
+      return state.user;
     }
   },
   mutations: {
@@ -19,17 +19,16 @@ export default {
   actions: {
     getUser: async function({ commit }) {
       var jwToken = localStorage.getItem("jwt");
-      console.log("jwToken------");
-      console.log(jwToken);
       if (jwToken) {
         setToken(jwToken);
-      }
-      const user = await api.get("/user");
-      console.log(user.data.user);
-      if (user.data && user.data.user) {
-        console.log("user::::::::::");
+        const user = await api.get("/user");
         console.log(user.data.user);
-        commit("setUser", user.data.user);
+        if (user.data && user.data.user) {
+          console.log(user.data.user);
+          commit("setUser", user.data.user);
+        }
+      } else {
+        commit("setUser", null);
       }
     },
     loginUser: async function({ commit }, { email, password }) {

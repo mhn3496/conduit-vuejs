@@ -16,27 +16,6 @@ export default {
     },
     currentArticle(state) {
       return state.currentArticle;
-    },
-    articleTitle(state) {
-      return state.currentArticle.title;
-    },
-    articleBody(state) {
-      return state.currentArticle.body;
-    },
-    articleAuthorName(state) {
-      return state.currentArticle.author.username;
-    },
-    articleAuthorImage(state) {
-      return state.currentArticle.author.image;
-    },
-    articleAuthorIsFollowed(state) {
-      return state.currentArticle.author.following;
-    },
-    articleTagsList(state) {
-      return state.currentArticle.tagList;
-    },
-    articleCreationDate(state) {
-      return state.currentArticle.createdAt;
     }
   },
   mutations: {
@@ -83,15 +62,10 @@ export default {
       let route = "/articles/";
       route += id;
       const response = await api.get(route);
-      console.log(response.data.article);
       commit("setCurrentArticle", response.data.article);
     },
     async postArticle({ commit }, { title, description, body, tagList }) {
       try {
-        console.log(title);
-        console.log(description);
-        console.log(body);
-        console.log(tagList);
         const response = await api.post("/articles", {
           article: {
             title,
@@ -112,10 +86,6 @@ export default {
 
     async editArticle({ commit }, { slug, title, description, body, tagList }) {
       try {
-        console.log(title);
-        console.log(description);
-        console.log(body);
-        console.log(tagList);
         let route = "/articles/";
         route += slug;
         const response = await api.put(route, {
@@ -134,6 +104,13 @@ export default {
         console.error(e);
         throw e;
       }
+    },
+    async deleteArticle({ commit }, slug) {
+      let route = "/articles/";
+      route += slug;
+
+      await api.delete(route, slug);
+      commit("setCurrentArticle", {});
     }
   }
 };

@@ -3,6 +3,7 @@ import Vuex from "vuex";
 import users from "./modules/users";
 import article from "./modules/article";
 import profile from "./modules/profile";
+import comments from "./modules/comments";
 
 Vue.use(Vuex);
 
@@ -13,6 +14,7 @@ export default new Vuex.Store({
   modules: {
     users,
     article,
-    profile
+    profile,
+    comments
   }
 });

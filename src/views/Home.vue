@@ -32,7 +32,7 @@
               </li>
             </ul>
           </div>
-          <div v-if="dataLoaded == false">Loading Articles....</div>
+          <div v-if="!dataLoaded">Loading Articles....</div>
           <ArticlePreview
             v-for="article in globalArticles"
             :key="article.slug"
@@ -88,7 +88,11 @@ export default {
   },
   computed: {
     username() {
-      return this.$store.getters["users/username"];
+      var retObj = this.$store.getters["users/user"];
+      if (retObj) {
+        return retObj.username;
+      }
+      return null;
     },
     globalArticles() {
       var obj = this.$store.getters["article/feed"];

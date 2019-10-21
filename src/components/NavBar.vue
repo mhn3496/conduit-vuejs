@@ -28,8 +28,10 @@
             Signup
           </router-link>
         </li>
-        <li v-if="username" class="nav-item nav-link" :to="`/@${username}`">
-          {{ username }}
+        <li v-if="username" class="nav-item">
+          <router-link class="nav-link" :to="`/@${username}`">
+            {{ username }}
+          </router-link>
         </li>
       </ul>
     </div>
@@ -48,7 +50,11 @@ export default {
   },
   computed: {
     username() {
-      return this.$store.getters["users/username"];
+      var retObj = this.$store.getters["users/user"];
+      if (retObj) {
+        return retObj.username;
+      }
+      return null;
     }
   }
 };
