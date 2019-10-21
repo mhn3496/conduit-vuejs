@@ -94,6 +94,30 @@ export default {
       console.log("response::::::::::::");
       console.log(response.data.article);
       commit("setCurrentArticle", response.data.article);
+    },
+    async postArticle({ commit }, { title, description, body, tagList }) {
+      try {
+        console.log(title);
+        console.log(description);
+        console.log(body);
+        console.log(tagList);
+        const response = await api.post("/articles", {
+          article: {
+            title,
+            description,
+            body,
+            tagList
+          }
+        });
+
+        if (response.data) {
+          console.log(response.data.article);
+          commit("setCurrentArticle", response.data.article);
+        }
+      } catch (e) {
+        console.error(e);
+        throw e;
+      }
     }
   }
 };
