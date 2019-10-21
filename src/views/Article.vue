@@ -10,12 +10,18 @@
             <a href="" class="author">{{ articleAuthorName }}</a>
             <span class="date">{{ formatDate(articleCreationDate) }}</span>
           </div>
-          <button
-            class="btn btn-sm btn-outline-secondary"
-            @click="followAuthor"
-          >
+          <button v-if="!authorIsUser" class="btn btn-sm btn-outline-secondary">
             <i class="ion-plus-round"></i>
             &nbsp; Follow {{ articleAuthorName }}
+            <span class="counter">(10)</span>
+          </button>
+          <button
+            v-if="authorIsUser"
+            class="btn btn-sm btn-outline-secondary"
+            @click="routeToArticleEdit"
+          >
+            <i class="ion-plus-round"></i>
+            &nbsp; Edit Article
             <span class="counter">(10)</span>
           </button>
           &nbsp;&nbsp;
@@ -129,6 +135,7 @@
 </template>
 <script>
 import moment from "moment";
+import router from "../router";
 export default {
   props: {
     slug: {
@@ -145,7 +152,11 @@ export default {
       var slug = this.$router.app._route.params.slug;
       this.$store.dispatch("article/getArticlebyId", slug);
     },
-    followAuthor() {}
+    followAuthor() {},
+    routeToArticleEdit() {
+      var obj = this.$store.getters["article/currentArticle"];
+      router.push({ name: "editor_edit", params: { slug: obj.slug } });
+    }
     //favouriteArticle(article_id) {}
   },
   created() {
@@ -175,6 +186,11 @@ export default {
     },
     articleCreationDate() {
       return this.$store.getters["article/articleCreationDate"];
+    },
+    authorIsUser() {
+      return (
+        this.article.author.username == this.$store.getters["users/username"]
+      );
     }
   },
 

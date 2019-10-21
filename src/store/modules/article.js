@@ -18,8 +18,6 @@ export default {
       return state.currentArticle;
     },
     articleTitle(state) {
-      console.log("getting title:::::::");
-      console.log(state.currentArticle.title);
       return state.currentArticle.title;
     },
     articleBody(state) {
@@ -44,8 +42,6 @@ export default {
   mutations: {
     setCurrentArticle(state, _article) {
       state.currentArticle = _article;
-      console.log("current article after mutation::::::");
-      console.log(state.currentArticle);
     },
     setArticles(state, { articles, articlesCount }) {
       state.feed = articles;
@@ -55,7 +51,6 @@ export default {
 
   actions: {
     async getGlobalFeed({ commit }, payload) {
-      console.log("getting global feed");
       let route = "/articles";
       if (payload) {
         const {
@@ -69,10 +64,7 @@ export default {
         route += favourited ? `favourited= ${favourited}&` : "";
         route += page ? `?offset=${(page - 1) * 10} & limit = 10` : "";
       }
-      console.log("route:" + route);
       const response = await api.get(route);
-      console.log("response:");
-      console.log(response);
       commit("setArticles", response.data, response.articlesCount);
     },
 
@@ -91,7 +83,6 @@ export default {
       let route = "/articles/";
       route += id;
       const response = await api.get(route);
-      console.log("response::::::::::::");
       console.log(response.data.article);
       commit("setCurrentArticle", response.data.article);
     },
@@ -111,7 +102,32 @@ export default {
         });
 
         if (response.data) {
-          console.log(response.data.article);
+          commit("setCurrentArticle", response.data.article);
+        }
+      } catch (e) {
+        console.error(e);
+        throw e;
+      }
+    },
+
+    async editArticle({ commit }, { slug, title, description, body, tagList }) {
+      try {
+        console.log(title);
+        console.log(description);
+        console.log(body);
+        console.log(tagList);
+        let route = "/articles/";
+        route += slug;
+        const response = await api.put(route, {
+          article: {
+            title,
+            description,
+            body,
+            tagList
+          }
+        });
+
+        if (response.data) {
           commit("setCurrentArticle", response.data.article);
         }
       } catch (e) {
