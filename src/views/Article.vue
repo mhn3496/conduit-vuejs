@@ -158,14 +158,7 @@ export default {
       this.$store.dispatch("comments/getComments", {
         slug: obj.slug
       });
-      this.getComments();
-    },
-    getComments() {
-      var obj = this.$store.getters["article/currentArticle"];
-      this.$store.dispatch("comments/getComments", {
-        slug: obj.slug
-      });
-      this.comments = this.$store.getters["comment/commentsOnArticle"];
+      this.fetchComments();
     },
     fetchComments() {
       var slug = this.$router.app._route.params.slug;
