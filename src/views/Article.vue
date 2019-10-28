@@ -210,7 +210,7 @@ export default {
     },
     authorIsUser() {
       return (
-        this.article.author.username == this.$store.getters["users/username"]
+        this.article.author.username == this.$store.getters["users/getUsername"]
       );
     },
     comments() {

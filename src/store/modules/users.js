@@ -9,6 +9,9 @@ export default {
   getters: {
     user(state) {
       return state.user;
+    },
+    getUsername(state) {
+      return state.user.username;
     }
   },
   mutations: {
